@@ -1,17 +1,14 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
-namespace Knife4jUIDemo.Controllers
+namespace NSwag.Swagger.Knife4jUI.Controllers
 {
-    /// <summary>
-    /// 中文这是一个Get请求这是一个Get请求
-    /// </summary>
     [ApiController]
-    [Route("api/WeatherForecast")]
+    [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
@@ -26,10 +23,6 @@ namespace Knife4jUIDemo.Controllers
             _logger = logger;
         }
 
-        /// <summary>
-        /// 这是一个Get请求
-        /// </summary>
-        /// <returns></returns>
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {

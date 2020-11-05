@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -10,13 +9,8 @@ using Microsoft.OpenApi.Models;
 using Basic.Swagger;
 using Microsoft.AspNetCore.Localization;
 using System.IO;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Reflection;
 using IGeekFan.AspNetCore.Knife4jUI;
+using Microsoft.AspNetCore.Mvc.Controllers;
 
 namespace Basic
 {
@@ -56,9 +50,9 @@ namespace Basic
 
                 c.GeneratePolymorphicSchemas();
 
-                c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Basic.xml"));
+                c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Basic.xml"),true);
 
-                c.EnableAnnotations();
+                //c.EnableAnnotations();
                 c.AddServer(new OpenApiServer()
                 {
                     Url = "",
@@ -66,7 +60,8 @@ namespace Basic
                 });
                 c.CustomOperationIds(apiDesc =>
                 {
-                    return apiDesc.TryGetMethodInfo(out MethodInfo methodInfo) ? methodInfo.Name : null;
+                    var controllerAction = apiDesc.ActionDescriptor as ControllerActionDescriptor;
+                    return controllerAction.ControllerName + "-" + controllerAction.ActionName;
                 });
 
                 c.OrderActionsBy((apiDesc) => $"{apiDesc.ActionDescriptor.RouteValues["controller"]}_{apiDesc.HttpMethod}");
@@ -104,12 +99,17 @@ namespace Basic
 
             app.UseSwagger(c =>
             {
-              
             });
 
-            app.UseKnife4UI(c =>
+            app.UseSwaggerUI(c =>
             {
                 c.RoutePrefix = ""; // serve the UI at root
+                c.SwaggerEndpoint("/v1/api-docs", "V1 Docs");
+                c.SwaggerEndpoint("/gp/api-docs", "µÇÂ¼Ä£¿é");
+            });
+            app.UseKnife4UI(c =>
+            {
+                //c.RoutePrefix = ""; // serve the UI at root
                 c.SwaggerEndpoint("/v1/api-docs", "V1 Docs");
                 c.SwaggerEndpoint("/gp/api-docs", "µÇÂ¼Ä£¿é");
             });

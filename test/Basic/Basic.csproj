@@ -8,6 +8,7 @@
 
   <ItemGroup>
 	  <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="5.5.1" />
+	  <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUi" Version="5.5.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -15,6 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\IGeekFan.AspNetCore.SwaggerUI\IGeekFan.AspNetCore.Knife4jUI.csproj" />
+    <ProjectReference Include="..\..\src\IGeekFan.AspNetCore.Knife4jUI\IGeekFan.AspNetCore.Knife4jUI.csproj" />
   </ItemGroup>
 </Project>

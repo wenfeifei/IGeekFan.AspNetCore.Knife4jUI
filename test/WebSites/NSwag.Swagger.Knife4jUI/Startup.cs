@@ -1,14 +1,19 @@
 using IGeekFan.AspNetCore.Knife4jUI;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
-using System.IO;
+using Microsoft.Extensions.Logging;
+// using Microsoft.OpenApi.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace Knife4jUIDemo
+namespace NSwag.Swagger.Knife4jUI
 {
     public class Startup
     {
@@ -22,24 +27,9 @@ namespace Knife4jUIDemo
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "API V1", Version = "v1" });
-                c.AddServer(new OpenApiServer()
-                {
-                    Url = "",
-                    Description = "vvv"
-                });
-                c.CustomOperationIds(apiDesc =>
-                {
-                    var controllerAction = apiDesc.ActionDescriptor as ControllerActionDescriptor;
-                    return controllerAction.ControllerName + "-" + controllerAction.ActionName;
-                });
 
-                var filePath = Path.Combine(System.AppContext.BaseDirectory, "Knife4jUIDemo.xml");
-                c.IncludeXmlComments(filePath, true);
-            });
+            services.AddControllers();
+            services.AddOpenApiDocument();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -56,23 +46,23 @@ namespace Knife4jUIDemo
 
             app.UseAuthorization();
 
-            app.UseSwagger();
-
-            app.UseSwaggerUI(c =>
+            app.UseOpenApi(settings =>
             {
-                c.SwaggerEndpoint("/v1/api-docs", "LinCms");
+                settings.PostProcess = (document, request) =>
+                {
+                    document.Info.Title = Configuration["Project:Name"];
+                };
             });
-
             app.UseKnife4UI(c =>
             {
-                c.RoutePrefix = ""; // serve the UI at root
-                c.SwaggerEndpoint("/v1/api-docs", "V1 Docs");
+                // c.RoutePrefix = "/docs"; // serve the UI at root
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "V1 Docs");
             });
+            // app.UseSwaggerUi3();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapSwagger("{documentName}/api-docs");
             });
         }
     }

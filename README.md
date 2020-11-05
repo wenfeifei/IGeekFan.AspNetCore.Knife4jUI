@@ -20,17 +20,30 @@
 
 ### 🚀安装包
 
+以下为使用Swashbuckle.AspNetCore.Swagger底层组件
+
 1.Install the standard Nuget package into your ASP.NET Core application.
 
 ```
-Package Manager : Install-Package IGeekFan.AspNetCore.Knife4jUI
-CLI : dotnet add package IGeekFan.AspNetCore.Knife4jUI
+Package Manager : 
+
+Install-Package Swashbuckle.AspNetCore.Swagger
+Install-Package Swashbuckle.AspNetCore.SwaggerGen
+Install-Package IGeekFan.AspNetCore.Knife4jUI
+
+OR
+
+CLI :
+
+dotnet add package Swashbuckle.AspNetCore.Swagger
+dotnet add package Swashbuckle.AspNetCore.SwaggerGen
+dotnet add package IGeekFan.AspNetCore.Knife4jUI
 ```
 
 2.In the ConfigureServices method of Startup.cs, register the Swagger generator, defining one or more Swagger documents.
 
 ```
-using System.Reflection;
+using Microsoft.AspNetCore.Mvc.Controllers
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using IGeekFan.AspNetCore.Knife4jUI;
@@ -49,7 +62,8 @@ using IGeekFan.AspNetCore.Knife4jUI;
         });
         c.CustomOperationIds(apiDesc =>
         {
-            return apiDesc.TryGetMethodInfo(out MethodInfo methodInfo) ? methodInfo.Name : null;
+            var controllerAction = apiDesc.ActionDescriptor as ControllerActionDescriptor;
+            return  controllerAction.ControllerName+"-"+controllerAction.ActionName;
         });
     });
 ```
@@ -72,6 +86,50 @@ app.UseEndpoints(endpoints =>
 });
 ```
 
+5.更多功能
+
+为文档添加注释 在项目上右键--属性--生成
+
+![](https://pic.downk.cc/item/5f34161d14195aa59413f0fc.jpg)
+
+在AddSwaggerGen方法中添加如下代码
+
+```
+c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "SwaggerDemo.xml"),true);
+```
+ 最后一个参数设置为true，代表启用控制器上的注释
+
+运行后如看不到控制器上注释显示，请点开文档管理->个性化设置，开启分组tag显示description说明属性
+
+![](https://pic.downk.cc/item/5f34171114195aa594142d2e.jpg)
+
+
+
+### NSwag.AspNetCore
+（请参考目录test/WebSites/NSwag.Swagger.Knife4jUI）
+
+```
+public void ConfigureServices(IServiceCollection services)
+ {
+    // 其它Service
+     services.AddOpenApiDocument();
+ }
+```
+
+```
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+            // 其它 Use
+          app.UseOpenApi();
+          app.UseKnife4UI(c =>
+         {
+               c.RoutePrefix = "";
+               c.SwaggerEndpoint("/swagger/v1/swagger.json");
+          });
+}
+```
+
+即可使用 Knife4jUI
 
 ### 🔎 效果图
 运行项目，打开 https://localhost:5001/index.html#/home
